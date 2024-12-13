@@ -99,6 +99,7 @@ alias more=less
 alias vi=nvim
 alias vim=nvim
 alias cat=bat
+alias vimclean='find ${HOME}/.local -name "*.swp" -exec rm {} \;'
 
 export HOMEREPO="$HOME/ws/app"
 
@@ -191,3 +192,22 @@ export TFENV_ARCH=amd64
 # export OPENAI_TYPE=azure
 # export OPENAI_API_VERSION="2023-03-15-preview"
 # export OPENAI_DEPLOYMENT_NAME="gpt-4-2023-08-04"
+eval "$(zoxide init --cmd cd zsh)"
+
+# Default AWS profile to use from ~/.aws/config
+export AWS_PROFILE=dev
+
+aws-profile () {
+  export AWS_PROFILE="$1"
+  aws sso login
+  aws configure list
+}
+
+aws-sts () {
+  aws sts get-caller-identity > /dev/null
+  if [ $? -ne 0 ]; then
+    aws sso login
+  fi
+  eval "$(aws2-wrap --export)"
+  aws configure list
+}
